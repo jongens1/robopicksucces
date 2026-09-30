@@ -104,7 +104,7 @@ if uploaded_file is not None:
 
     st.markdown("---")
 
-    # Sekcia: Graf Úspešnosti podľa Robotov (5 riadkov)
+    # Sekcia: Graf Úspešnosti podľa Robotov (5 riadkov, odtiene modrej)
     st.subheader("📊 Úspešnosť podľa robotov")
 
     robot_stats = (
@@ -127,7 +127,7 @@ if uploaded_file is not None:
     # Zotriedenie pre prehľadné zobrazenie v grafe
     robot_stats = robot_stats.sort_values(by="RobotID", ascending=True)
 
-    # Horizontálny stĺpcový graf (každý robot má vlastný riadok)
+    # Horizontálny stĺpcový graf v odtieňoch modrej ("Blues")
     fig_robots = px.bar(
         robot_stats,
         x="SuccessRate",
@@ -136,8 +136,8 @@ if uploaded_file is not None:
         text="LabelText",
         labels={"RobotID": "Robot", "SuccessRate": "Úspešnosť (%)"},
         color="SuccessRate",
-        color_continuous_scale="RdYlGn",
-        range_color=[70, 100],
+        color_continuous_scale="Blues",  # Nastavené odtiene modrej
+        range_color=[50, 100],  # Vybielenie/zvýraznenie rozdielov
     )
 
     fig_robots.update_traces(
