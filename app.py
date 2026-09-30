@@ -1,4 +1,5 @@
 import json
+import os
 import re
 import pandas as pd
 import plotly.express as px
@@ -73,13 +74,28 @@ def parse_log_data(file_content):
 # Title & Header
 st.title("🤖 Dashboard Úspešnosti Robotického Pickovania")
 
-# Sidebar Upload & Filter
+# Názov predvoleného súboru v repozitári
+DEFAULT_FILE_PATH = "robopick309.txt"
+
+# Sidebar Upload & Logika načítania dát
 uploaded_file = st.sidebar.file_uploader(
-    "Vložte logovací súbor (.txt / .log)", type=["txt", "log"]
+    "Vložte vlastný súbor (.txt / .log)", type=["txt", "log"]
 )
 
+file_bytes = None
+
 if uploaded_file is not None:
-    df = parse_log_data(uploaded_file.getvalue())
+    file_bytes = uploaded_file.getvalue()
+    st.sidebar.success("📂 Zobrazené sú dáta z **nahraného súboru**.")
+elif os.path.exists(DEFAULT_FILE_PATH):
+    with open(DEFAULT_FILE_PATH, "rb") as f:
+        file_bytes = f.read()
+    st.sidebar.info(
+        f"📄 Predvolené dáta načítané zo súboru: **{DEFAULT_FILE_PATH}**"
+    )
+
+if file_bytes is not None:
+    df = parse_log_data(file_bytes)
 
     available_robots = sorted(df["RobotID"].unique().tolist())
     selected_robots = st.sidebar.multiselect(
@@ -136,8 +152,8 @@ if uploaded_file is not None:
         text="LabelText",
         labels={"RobotID": "Robot", "SuccessRate": "Úspešnosť (%)"},
         color="SuccessRate",
-        color_continuous_scale="Blues",  # Nastavené odtiene modrej
-        range_color=[50, 100],  # Vybielenie/zvýraznenie rozdielov
+        color_continuous_scale="Blues",
+        range_color=[50, 100],
     )
 
     fig_robots.update_traces(
@@ -189,4 +205,6 @@ if uploaded_file is not None:
         st.success("V vybraných dátach sa nenachádzajú žiadne zlyhané picky!")
 
 else:
-    st.info("👆 Prosím, nahrajte súbor s logmi v ľavom menu.")
+    st.info(
+        "👆 Súbor `robopick309.txt` sa nenašiel v repozitári. Nahrajte vlastný logovací súbor v ľavom menu."
+    )
